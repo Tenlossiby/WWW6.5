@@ -26,7 +26,7 @@ contract SimpleERC20 {
         emit Transfer(address(0), msg.sender, totalSupply);
     }
     //它确保发送者（msg.sender）有足够的代币，使用 require(balanceOf[msg.sender] >= _value)
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address _to, uint256 _value) public virtual returns (bool) {
         require(balanceOf[msg.sender] >= _value, "Not enough balance");
         _transfer(msg.sender, _to, _value);
         return true;
@@ -38,7 +38,7 @@ contract SimpleERC20 {
         return true;
     }
     //允许已获批准的人代为转移代币
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) public virtual returns (bool) {
         require(balanceOf[_from] >= _value, "Not enough balance");
         require(allowance[_from][msg.sender] >= _value, "Allowance too low");
         allowance[_from][msg.sender] -= _value;
@@ -52,4 +52,5 @@ contract SimpleERC20 {
         balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
     }
+    
 }
