@@ -1,4 +1,4 @@
-import{_ as p,u as C,o as k,c as _,a as e,b as o,t as f,d as r,r as v}from"./index-C4xtsuMI.js";import{K as y,F as g}from"./FullCodeModal-CwHUfA-A.js";const b={class:"day-1-content"},m={class:"content-layout"},w={class:"left-column"},x={class:"interaction-area"},F={class:"interaction-controls"},S={class:"result-display"},B={class:"result-value"},a=`//SPDx-License-Identifier:MIT
+import{_ as p,u as C,o as k,c as _,a as e,b as o,t as f,d as r,r as v}from"./index-D8X_Cvii.js";import{K as y,F as g}from"./FullCodeModal-D0U1aGyQ.js";const b={class:"day-1-content"},m={class:"content-layout"},w={class:"left-column"},x={class:"interaction-area"},F={class:"interaction-controls"},S={class:"result-display"},B={class:"result-value"},a=`//SPDx-License-Identifier:MIT
 
 // 声明Solidity版本，要求编译器版本在0.8.0或更高（但低于0.9.0）
 pragma solidity ^0.8.0;
