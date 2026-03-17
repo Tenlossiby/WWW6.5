@@ -1,115 +1,178 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
-// IWeatherOracle - 天气预言机接口
-// 模拟 Chainlink 的 AggregatorV3Interface 接口
-// 用于获取外部数据（降雨量）
-interface IWeatherOracle {
-    // 获取最新的数据轮次信息
-    // 返回:
-    //   roundId: 数据轮次 ID
-    //   answer: 数据值（这里是降雨量，单位毫米）
-    //   startedAt: 轮次开始时间
-    //   updatedAt: 数据更新时间
-    //   answeredInRound: 回答所在的轮次
-    function latestRoundData()
-        external
-        view
-        returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        );
-}
+// 导入 Chainlink 预言机接口，用于获取外部数据
+import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+// 导入 OpenZeppelin 的 Ownable 合约，实现所有权管理
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-// CropInsurance - 农作物保险合约
-// 这是一个参数保险（Parametric Insurance）合约
-// 当降雨量低于阈值时自动赔付，无需人工审核
-contract CropInsurance {
-    // 天气预言机合约地址
-    IWeatherOracle public weatherOracle;
+// CropInsurance - 农作物保险合约（升级版）
+// 这是一个参数保险合约，使用 Chainlink 预言机获取降雨量和 ETH/USD 价格
+// 当降雨量低于阈值时，自动向投保农民赔付
+contract CropInsurance is Ownable {
+    // 天气预言机接口，用于获取降雨量数据
+    AggregatorV3Interface private weatherOracle;
+    // ETH/USD 价格预言机，用于将美元金额转换为 ETH
+    AggregatorV3Interface private ethUsdPriceFeed;
 
     // 常量定义
-    uint256 public constant RAINFALL_THRESHOLD = 50; // 降雨阈值（毫米）
-    uint256 public constant PAYOUT_AMOUNT = 1 ether;  // 赔付金额（1 ETH）
-    uint256 public constant PREMIUM = 0.1 ether;      // 保费（0.1 ETH）
+    uint256 public constant RAINFALL_THRESHOLD = 500;        // 降雨阈值（毫米），低于此值触发赔付
+    uint256 public constant INSURANCE_PREMIUM_USD = 10;      // 保险保费（美元）
+    uint256 public constant INSURANCE_PAYOUT_USD = 50;       // 保险赔付金额（美元）
 
-    // 存储已购买保险的用户
-    // key: 用户地址
-    // value: 是否有有效保单
-    mapping(address => bool) public policies;
+    // 存储每个地址的投保状态
+    mapping(address => bool) public hasInsurance;
+    // 存储每个地址上次索赔的时间戳，用于限制索赔频率
+    mapping(address => uint256) public lastClaimTimestamp;
+
+    // 事件定义
+    event InsurancePurchased(address indexed farmer, uint256 amount);  // 购买保险事件
+    event ClaimSubmitted(address indexed farmer);                      // 提交索赔事件
+    event ClaimPaid(address indexed farmer, uint256 amount);           // 赔付完成事件
+    event RainfallChecked(address indexed farmer, uint256 rainfall);   // 检查降雨量事件
 
     // 构造函数
-    // _oracleAddress: 天气预言机合约地址
-    constructor(address _oracleAddress) {
-        weatherOracle = IWeatherOracle(_oracleAddress);
+    // _weatherOracle: 天气预言机合约地址
+    // _ethUsdPriceFeed: ETH/USD 价格预言机地址
+    constructor(address _weatherOracle, address _ethUsdPriceFeed) payable Ownable(msg.sender) {
+        weatherOracle = AggregatorV3Interface(_weatherOracle);
+        ethUsdPriceFeed = AggregatorV3Interface(_ethUsdPriceFeed);
     }
 
-    // 接收 ETH 的函数
-    // 用于向保险池充值资金
+    // 购买保险函数
+    // 农民支付保费购买保险，保费金额根据当前 ETH 价格动态计算
+    function purchaseInsurance() external payable {
+        // 获取当前 ETH/USD 价格
+        uint256 ethPrice = getEthPrice();
+        // 计算保费对应的 ETH 数量
+        // 公式: (保费美元 * 1e18) / ETH价格 = 所需ETH数量（wei）
+        uint256 premiumInEth = (INSURANCE_PREMIUM_USD * 1e18) / ethPrice;
+
+        // 验证支付的 ETH 足够
+        require(msg.value >= premiumInEth, "Insufficient premium amount");
+        // 验证该地址尚未投保
+        require(!hasInsurance[msg.sender], "Already insured");
+
+        // 记录投保状态
+        hasInsurance[msg.sender] = true;
+        // 触发购买保险事件
+        emit InsurancePurchased(msg.sender, msg.value);
+    }
+
+    // 检查降雨量并索赔函数
+    // 农民调用此函数检查降雨量，如果低于阈值则自动获得赔付
+    function checkRainfallAndClaim() external {
+        // 验证调用者有有效保险
+        require(hasInsurance[msg.sender], "No active insurance");
+        // 验证距离上次索赔已超过 24 小时（防止频繁索赔）
+        require(block.timestamp >= lastClaimTimestamp[msg.sender] + 1 days, "Must wait 24h between claims");
+
+        // 从天气预言机获取最新降雨量数据
+        (
+            uint80 roundId,           // 数据轮次ID
+            int256 rainfall,          // 降雨量数据
+            ,                         // 开始时间（未使用）
+            uint256 updatedAt,        // 数据更新时间
+            uint80 answeredInRound    // 回答所在轮次
+        ) = weatherOracle.latestRoundData();
+
+        // 验证数据有效性
+        require(updatedAt > 0, "Round not complete");
+        // 验证数据不是过期的（answeredInRound >= roundId 表示数据是最新的）
+        require(answeredInRound >= roundId, "Stale data");
+
+        // 将降雨量转换为 uint256
+        uint256 currentRainfall = uint256(rainfall);
+        // 触发检查降雨量事件
+        emit RainfallChecked(msg.sender, currentRainfall);
+
+        // 判断降雨量是否低于阈值（干旱条件）
+        if (currentRainfall < RAINFALL_THRESHOLD) {
+            // 更新上次索赔时间戳
+            lastClaimTimestamp[msg.sender] = block.timestamp;
+            // 触发提交索赔事件
+            emit ClaimSubmitted(msg.sender);
+
+            // 获取当前 ETH/USD 价格
+            uint256 ethPrice = getEthPrice();
+            // 计算赔付金额对应的 ETH 数量
+            uint256 payoutInEth = (INSURANCE_PAYOUT_USD * 1e18) / ethPrice;
+
+            // 执行赔付转账
+            // 使用 call{value: amount}("") 发送 ETH，更灵活且兼容性好
+            (bool success, ) = msg.sender.call{value: payoutInEth}("");
+            require(success, "Transfer failed");
+
+            // 触发赔付完成事件
+            emit ClaimPaid(msg.sender, payoutInEth);
+        }
+    }
+
+    // 获取 ETH/USD 价格函数
+    // 从 Chainlink 价格预言机获取当前 ETH 价格
+    // 返回: ETH 价格（美元），精度为 8 位小数（即 $3000.00 = 300000000000）
+    function getEthPrice() public view returns (uint256) {
+        (
+            ,                 // roundId（未使用）
+            int256 price,     // ETH/USD 价格
+            ,                 // startedAt（未使用）
+            ,                 // updatedAt（未使用）
+                              // answeredInRound（未使用）
+        ) = ethUsdPriceFeed.latestRoundData();
+
+        return uint256(price);
+    }
+
+    // 获取当前降雨量函数
+    // 从天气预言机获取最新降雨量数据
+    function getCurrentRainfall() public view returns (uint256) {
+        (
+            ,                 // roundId（未使用）
+            int256 rainfall,  // 降雨量数据
+            ,                 // startedAt（未使用）
+            ,                 // updatedAt（未使用）
+                              // answeredInRound（未使用）
+        ) = weatherOracle.latestRoundData();
+
+        return uint256(rainfall);
+    }
+
+    // 提取合约余额（仅合约所有者）
+    // 用于合约所有者提取合约中的 ETH
+    function withdraw() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
+
+    // 接收 ETH 函数
+    // 允许合约接收 ETH，用于向保险池充值
     receive() external payable {}
 
-    // 购买保险
-    // 需要支付 0.1 ETH 保费
-    // 每个地址只能购买一份有效保单
-    function purchasePolicy() external payable {
-        // 验证支付的保费金额正确
-        require(msg.value == PREMIUM, "Incorrect premium amount");
-
-        // 验证该地址没有已激活的保单
-        require(!policies[msg.sender], "Policy already active");
-
-        // 激活保单
-        policies[msg.sender] = true;
-    }
-
-    // 检查降雨量并索赔
-    // 用户主动调用此函数来检查条件并领取赔付
-    // 如果降雨量低于阈值，自动获得赔付
-    function checkRainfallAndClaim() external {
-        // 验证用户有有效保单
-        require(policies[msg.sender], "No active policy");
-
-        // 从预言机获取最新降雨量数据
-        (, int256 rainfall, , , ) = weatherOracle.latestRoundData();
-
-        // 验证降雨量低于阈值（干旱条件）
-        require(rainfall < int256(RAINFALL_THRESHOLD), "Rainfall sufficient, no payout");
-
-        // 验证合约有足够资金进行赔付
-        require(address(this).balance >= PAYOUT_AMOUNT, "Insufficient funds in contract");
-
-        // 标记保单为已处理（防止重复索赔）
-        // 注意: 在发送 ETH 之前更新状态，防止重入攻击
-        policies[msg.sender] = false;
-
-        // 执行赔付转账
-        // 修改说明: 原代码使用 transfer()，但 Solidity 0.8.19+ 已弃用 transfer()
-        // 原因: transfer() 固定只转发 2300 gas，如果接收方合约需要更多 gas 会失败
-        // 新代码使用 call{value: amount}("")，更灵活且兼容性好
-        // 注意: call 不会自动回滚，需要手动检查返回值
-        (bool success, ) = payable(msg.sender).call{value: PAYOUT_AMOUNT}("");
-        require(success, "ETH transfer failed");
+    // 获取合约余额函数
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 }
 
-// 参数保险特点:
+// 合约设计要点说明:
 //
-// 1. 自动执行:
-//    - 基于客观数据（降雨量）自动触发赔付
-//    - 无需人工审核或损失评估
+// 1. 双预言机设计:
+//    - weatherOracle: 获取降雨量数据
+//    - ethUsdPriceFeed: 获取 ETH/USD 价格，实现美元计价、ETH 支付
 //
-// 2. 预言机依赖:
-//    - 依赖外部数据源（天气数据）
-//    - 需要信任预言机的准确性
+// 2. 价格转换计算:
+//    - 保费和赔付金额以美元计价
+//    - 根据实时 ETH 价格转换为 ETH 数量
+//    - 公式: ethAmount = (usdAmount * 1e18) / ethPrice
 //
-// 3. 风险池:
-//    - 合约需要保持足够的资金储备
-//    - 保费收入应该能够覆盖预期赔付
+// 3. 安全措施:
+//    - 24 小时索赔冷却期，防止频繁索赔
+//    - 预言机数据新鲜度检查（answeredInRound >= roundId）
+//    - 使用 Ownable 管理合约所有权
 //
-// 4. 使用场景:
-//    - 农作物干旱保险
-//    - 航班延误保险
-//    - 任何可量化参数的风险
+// 4. 事件日志:
+//    - 记录所有关键操作，便于前端监听和链下分析
+//
+// 5. 使用场景:
+//    - 农民购买保险，支付 ETH 作为保费
+//    - 干旱发生时（降雨量 < 500mm），自动获得 ETH 赔付
+//    - 赔付金额根据实时 ETH 价格动态计算
