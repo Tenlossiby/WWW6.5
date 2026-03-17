@@ -1,11 +1,63 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-// 导入 Chainlink 的 AggregatorV3Interface 接口
-// 这是 Chainlink 价格预言机的标准接口
-import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-// 导入 OpenZeppelin 的 Ownable 合约，实现所有权管理
-import "@openzeppelin/contracts/access/Ownable.sol";
+// Chainlink 预言机接口定义 - 直接内联，无需外部依赖
+// 这个接口定义与 Chainlink 官方完全一致，确保兼容性
+interface AggregatorV3Interface {
+    // 获取数据精度（小数位数）
+    function decimals() external view returns (uint8);
+    // 获取预言机描述信息
+    function description() external view returns (string memory);
+    // 获取预言机版本号
+    function version() external view returns (uint256);
+    // 获取指定轮次的数据
+    function getRoundData(uint80 _roundId) external view returns (
+        uint80 roundId,
+        int256 answer,
+        uint256 startedAt,
+        uint256 updatedAt,
+        uint80 answeredInRound
+    );
+    // 获取最新轮次的数据（最常用的函数）
+    function latestRoundData() external view returns (
+        uint80 roundId,
+        int256 answer,
+        uint256 startedAt,
+        uint256 updatedAt,
+        uint80 answeredInRound
+    );
+}
+
+// 简单的所有权管理合约 - 直接内联，无需外部依赖
+// 实现了基本的访问控制功能，只有合约所有者能执行特定操作
+contract Ownable {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    constructor(address initialOwner) {
+        _transferOwnership(initialOwner);
+    }
+
+    modifier onlyOwner() {
+        _checkOwner();
+        _;
+    }
+
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    function _checkOwner() internal view virtual {
+        require(owner() == msg.sender, "Ownable: caller is not the owner");
+    }
+
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
 
 // MockWeatherOracle - 模拟天气预言机合约（升级版）
 // 实现了 Chainlink 的 AggregatorV3Interface 接口
