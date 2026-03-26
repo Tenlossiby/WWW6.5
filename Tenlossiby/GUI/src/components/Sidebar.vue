@@ -82,7 +82,7 @@
 <script setup>
 import { computed } from 'vue'
 import { dayConfigs } from '../data/days'
-import { conceptDefinitions, day11ConceptDefinitions, day12ConceptDefinitions, day13ConceptDefinitions, day14ConceptDefinitions, day15ConceptDefinitions, day16ConceptDefinitions, day17ConceptDefinitions, day18ConceptDefinitions, day19ConceptDefinitions, day20ConceptDefinitions, day21ConceptDefinitions } from '../data/concepts'
+import { conceptDefinitions, day11ConceptDefinitions, day12ConceptDefinitions, day13ConceptDefinitions, day14ConceptDefinitions, day15ConceptDefinitions, day16ConceptDefinitions, day17ConceptDefinitions, day18ConceptDefinitions, day19ConceptDefinitions, day20ConceptDefinitions, day21ConceptDefinitions, day22ConceptDefinitions, day23ConceptDefinitions, day24ConceptDefinitions, day25ConceptDefinitions, day26ConceptDefinitions, day27ConceptDefinitions, day28ConceptDefinitions, day29ConceptDefinitions } from '../data/concepts'
 import { useOperationLogStore } from '@/stores/operationLogStore'
 
 const props = defineProps({
@@ -156,6 +156,22 @@ const currentDayConcepts = computed(() => {
     conceptDefs = day20ConceptDefinitions
   } else if (props.currentDay === 21) {
     conceptDefs = day21ConceptDefinitions
+  } else if (props.currentDay === 22) {
+    conceptDefs = day22ConceptDefinitions
+  } else if (props.currentDay === 23) {
+    conceptDefs = day23ConceptDefinitions
+  } else if (props.currentDay === 24) {
+    conceptDefs = day24ConceptDefinitions
+  } else if (props.currentDay === 25) {
+    conceptDefs = day25ConceptDefinitions
+  } else if (props.currentDay === 26) {
+    conceptDefs = day26ConceptDefinitions
+  } else if (props.currentDay === 27) {
+    conceptDefs = day27ConceptDefinitions
+  } else if (props.currentDay === 28) {
+    conceptDefs = day28ConceptDefinitions
+  } else if (props.currentDay === 29) {
+    conceptDefs = day29ConceptDefinitions
   }
 
   return dayConfig.concepts.map(conceptKey => {

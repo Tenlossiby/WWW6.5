@@ -1,6 +1,6 @@
 # Solidity学习互动演示GUI开发工作流程 Skill
 
-> 文档版本：20260320 (Day 21 已添加)
+> 文档版本：20260326 (Day 29 已添加)
 
 ## 项目概述
 
@@ -43,7 +43,15 @@ GUI/
 │   │       ├── Day18/OracleContract.vue   # 预言机 + 参数保险
 │   │       ├── Day19/SignThis.vue         # 签名验证 + 无Gas空投
 │   │       ├── Day20/ReentryAttack.vue    # 重入攻击 + 安全防护
-│   │       └── Day21/SimpleNFT.vue        # ERC721 NFT标准 + 铸造/转移/授权
+│   │       ├── Day21/SimpleNFT.vue        # ERC721 NFT标准 + 铸造/转移/授权
+│   │       ├── Day22/FairChainLottery.vue     # 公平链上彩票 + Mock VRF随机数
+│   │       ├── Day23/SimpleLending.vue        # DeFi借贷平台 + 抵押借款利息
+│   │       ├── Day24/EnhancedSimpleEscrow.vue # 增强托管合约 + 三方托管/超时/争议
+│   │       ├── Day25/AutomatedMarketMaker.vue # 自动化做市商 + 流动性池/代币交换/LP代币
+│   │       ├── Day26/NFTMarketplace.vue       # NFT市场 + 挂单/购买/取消/版税/市场费
+│   │   ├── Day27/YieldFarming.vue         # 收益耕作 + DeFi质押/奖励计算/紧急提取
+    │   │   ├── Day28/DecentralizedGovernance.vue # 去中心化治理 + DAO治理/提案/投票/执行
+    │   │   └── Day29/SimpleStablecoin.vue     # 简单稳定币 + 超额抵押/价格预言机/清算机制
 │   ├── composables/               # 组合式函数
 │   │   ├── useDay1.js
 │   │   ├── useDay2.js
@@ -57,7 +65,15 @@ GUI/
 │   │   ├── useDay18.js            # OracleContract 业务逻辑 + 双预言机
 │   │   ├── useDay19.js            # SignThis 业务逻辑 + ECDSA签名
 │   │   ├── useDay20.js            # ReentryAttack 业务逻辑 + 重入攻击模拟
-│   │   └── useDay21.js            # SimpleNFT 业务逻辑 + NFT铸造/转移/授权
+│   │   ├── useDay21.js            # SimpleNFT 业务逻辑 + NFT铸造/转移/授权
+│   │   ├── useDay22.js            # FairChainLottery 业务逻辑 + 彩票/VRF/获胜者
+│   │   ├── useDay23.js            # SimpleLending 业务逻辑 + DeFi借贷/抵押/利息
+│   │   ├── useDay24.js            # EnhancedSimpleEscrow 业务逻辑 + 三方托管/超时/争议
+│   │   ├── useDay25.js            # AutomatedMarketMaker 业务逻辑 + AMM/流动性/交换
+│   │   ├── useDay26.js            # NFTMarketplace 业务逻辑 + NFT市场/挂单/购买/版税
+│   │   ├── useDay27.js            # YieldFarming 业务逻辑 + DeFi质押/奖励计算/紧急提取
+    │   │   ├── useDay28.js            # DecentralizedGovernance 业务逻辑 + DAO治理/提案/投票/执行
+    │   │   └── useDay29.js            # SimpleStablecoin 业务逻辑 + 超额抵押/铸造/销毁/清算
 │   ├── data/
 │   │   ├── concepts.js            # 概念定义
 │   │   └── days.js                # 日程配置（核心配置）
@@ -98,7 +114,12 @@ contracts: {
   day18: { currentUser, currentRole, ethPrice, rainfall, hasInsurance, contractBalance },  // 预言机 + 参数保险
   day19: { currentRole, currentUserAddress, organizer, generatedSignature, isEntered, participantsList },  // 签名验证 + 无Gas空投
   day20: { currentRole, vaultBalance, userBalances, reentrancyStatus, isAttacking, attackCount },  // 重入攻击 + 安全防护
-  day21: { nfts, tokenApprovals, operatorApprovals, selectedTokenId, mintForm, transferForm, approveForm, operatorForm, queryForm }  // ERC721 NFT标准 + 铸造/转移/授权
+  day21: { nfts, tokenApprovals, operatorApprovals, selectedTokenId, mintForm, transferForm, approveForm, operatorForm, queryForm },  // ERC721 NFT标准 + 铸造/转移/授权
+  day22: { lotteryState, players, recentWinner, currentRole, entranceFee, prizePool, requestId },  // 公平链上彩票 + 状态机/VRF/获胜者
+  day23: { walletBalance, depositBalance, collateralBalance, borrowBalance, currentDebt, healthFactor, totalLiquidity, utilizationRate, interestRate, lastUpdateTime },  // DeFi借贷 + 存款/抵押/借款/利息
+  day24: { escrowState, currentRole, funds, escrowInfo, eventLog, addresses },  // 三方托管 + 枚举状态机/超时/争议仲裁
+  day25: { reserveA, reserveB, totalLPSupply, lpBalances, swapHistory, priceImpact },  // AMM + 流动性池/代币交换/LP代币
+  day26: { listings, marketplaceFeePercent, feeRecipient, totalVolume, userNFTs, activeListings, myListings }  // NFT市场 + 挂单/购买/取消/版税
 }
 
 // progressStore.js - 学习进度（自动从 dayConfigs 生成）

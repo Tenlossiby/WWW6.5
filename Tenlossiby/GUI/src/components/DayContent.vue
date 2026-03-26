@@ -35,7 +35,15 @@ const dayComponents = {
   18: defineAsyncComponent(() => import('./days/Day18/OracleContract.vue')),
   19: defineAsyncComponent(() => import('./days/Day19/SignThis.vue')),
   20: defineAsyncComponent(() => import('./days/Day20/ReentryAttack.vue')),
-  21: defineAsyncComponent(() => import('./days/Day21/SimpleNFT.vue'))
+  21: defineAsyncComponent(() => import('./days/Day21/SimpleNFT.vue')),
+  22: defineAsyncComponent(() => import('./days/Day22/FairChainLottery.vue')),
+  23: defineAsyncComponent(() => import('./days/Day23/SimpleLending.vue')),
+  24: defineAsyncComponent(() => import('./days/Day24/EnhancedSimpleEscrow.vue')),
+  25: defineAsyncComponent(() => import('./days/Day25/AutomatedMarketMaker.vue')),
+  26: defineAsyncComponent(() => import('./days/Day26/NFTMarketplace.vue')),
+  27: defineAsyncComponent(() => import('./days/Day27/YieldFarming.vue')),
+  28: defineAsyncComponent(() => import('./days/Day28/DecentralizedGovernance.vue')),
+  29: defineAsyncComponent(() => import('./days/Day29/SimpleStablecoin.vue'))
 }
 
 const props = defineProps({

@@ -41,7 +41,11 @@
         </div>
       </div>
 
-      <button v-if="allConceptsUnlocked" class="view-full-code-btn" @click="showFullCode">
+      <button 
+        v-if="allConceptsUnlocked" 
+        class="view-full-code-btn" 
+        @click="showFullCode"
+      >
         📖 查看完整代码
       </button>
     </div>
@@ -51,7 +55,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useConceptInteraction } from '@/composables/useConceptInteraction'
-import { conceptDefinitions, getHint, getConceptExplanationHint, day11ConceptDefinitions, getDay11ExplanationHint, day12ConceptDefinitions, getDay12Hint, getDay12ExplanationHint, day13ConceptDefinitions, getDay13ExplanationHint, day14ConceptDefinitions, getDay14Hint, getDay14ExplanationHint, day15ConceptDefinitions, getDay15Hint, getDay15ExplanationHint, day16ConceptDefinitions, getDay16Hint, getDay16ExplanationHint, day17ConceptDefinitions, getDay17Hint, getDay17ExplanationHint, day18ConceptDefinitions, getDay18Hint, getDay18ExplanationHint, day19ConceptDefinitions, getDay19Hint, getDay19ExplanationHint, day20ConceptDefinitions, getDay20Hint, getDay20ExplanationHint, day21ConceptDefinitions, getDay21Hint, getDay21ExplanationHint } from '@/data/concepts'
+import { conceptDefinitions, getHint, getConceptExplanationHint, day11ConceptDefinitions, getDay11ExplanationHint, day12ConceptDefinitions, getDay12Hint, getDay12ExplanationHint, day13ConceptDefinitions, getDay13ExplanationHint, day14ConceptDefinitions, getDay14Hint, getDay14ExplanationHint, day15ConceptDefinitions, getDay15Hint, getDay15ExplanationHint, day16ConceptDefinitions, getDay16Hint, getDay16ExplanationHint, day17ConceptDefinitions, getDay17Hint, getDay17ExplanationHint, day18ConceptDefinitions, getDay18Hint, getDay18ExplanationHint, day19ConceptDefinitions, getDay19Hint, getDay19ExplanationHint, day20ConceptDefinitions, getDay20Hint, getDay20ExplanationHint, day21ConceptDefinitions, getDay21Hint, getDay21ExplanationHint, day22ConceptDefinitions, getDay22Hint, getDay22ExplanationHint, day23ConceptDefinitions, getDay23Hint, getDay23ExplanationHint, day24ConceptDefinitions, getDay24Hint, getDay24ExplanationHint, day25ConceptDefinitions, getDay25Hint, getDay25ExplanationHint, day26ConceptDefinitions, getDay26Hint, getDay26ExplanationHint, day27ConceptDefinitions, getDay27Hint, getDay27ExplanationHint, day28ConceptDefinitions, getDay28Hint, getDay28ExplanationHint, day29ConceptDefinitions, getDay29Hint, getDay29ExplanationHint } from '@/data/concepts'
 
 const props = defineProps({
   // 当前Day编号
@@ -253,6 +257,30 @@ const getConceptDefinition = (key) => {
   if (props.currentDay === 21) {
     return day21ConceptDefinitions[key]
   }
+  if (props.currentDay === 22) {
+    return day22ConceptDefinitions[key]
+  }
+  if (props.currentDay === 23) {
+    return day23ConceptDefinitions[key]
+  }
+  if (props.currentDay === 24) {
+    return day24ConceptDefinitions[key]
+  }
+  if (props.currentDay === 25) {
+    return day25ConceptDefinitions[key]
+  }
+  if (props.currentDay === 26) {
+    return day26ConceptDefinitions[key]
+  }
+  if (props.currentDay === 27) {
+    return day27ConceptDefinitions[key]
+  }
+  if (props.currentDay === 28) {
+    return day28ConceptDefinitions[key]
+  }
+  if (props.currentDay === 29) {
+    return day29ConceptDefinitions[key]
+  }
   return conceptDefinitions[key]
 }
 
@@ -307,6 +335,33 @@ const getConceptHint = (key) => {
   }
   if (props.currentDay === 20) {
     return getDay20ExplanationHint(key)
+  }
+  if (props.currentDay === 21) {
+    return getDay21ExplanationHint(key)
+  }
+  if (props.currentDay === 22) {
+    return getDay22ExplanationHint(key)
+  }
+  if (props.currentDay === 23) {
+    return getDay23ExplanationHint(key)
+  }
+  if (props.currentDay === 24) {
+    return getDay24ExplanationHint(key)
+  }
+  if (props.currentDay === 25) {
+    return getDay25ExplanationHint(key)
+  }
+  if (props.currentDay === 26) {
+    return getDay26ExplanationHint(key)
+  }
+  if (props.currentDay === 27) {
+    return getDay27ExplanationHint(key)
+  }
+  if (props.currentDay === 28) {
+    return getDay28ExplanationHint(key)
+  }
+  if (props.currentDay === 29) {
+    return getDay29ExplanationHint(key)
   }
   return getConceptExplanationHint(key)
 }
@@ -391,7 +446,52 @@ const hintText = computed(() => {
     return getDay21Hint(currentConcept.value.key)
   }
 
-  // 优先级 7: 用户手动点击概念标签，显示详细解释
+  // 优先级 6: 外部传入的自定义提示（提升优先级，确保操作提示能正确显示）
+  if (props.customHint && props.customHint.trim()) {
+    return props.customHint
+  }
+
+  // 优先级 7: Day 22 显示下一步提示（只有没有customHint时才使用）
+  if (props.currentDay === 22 && currentConcept.value && !manualConceptKey.value) {
+    return getDay22Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 23 显示下一步提示
+  if (props.currentDay === 23 && currentConcept.value && !manualConceptKey.value) {
+    return getDay23Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 24 显示下一步提示
+  if (props.currentDay === 24 && currentConcept.value && !manualConceptKey.value) {
+    return getDay24Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 25 显示下一步提示
+  if (props.currentDay === 25 && currentConcept.value && !manualConceptKey.value) {
+    return getDay25Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 26 显示下一步提示
+  if (props.currentDay === 26 && currentConcept.value && !manualConceptKey.value) {
+    return getDay26Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 27 显示下一步提示
+  if (props.currentDay === 27 && currentConcept.value && !manualConceptKey.value) {
+    return getDay27Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 28 显示下一步提示
+  if (props.currentDay === 28 && currentConcept.value && !manualConceptKey.value) {
+    return getDay28Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 7: Day 29 显示下一步提示
+  if (props.currentDay === 29 && currentConcept.value && !manualConceptKey.value) {
+    return getDay29Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
+  // 优先级 8: 用户手动点击概念标签，显示详细解释
   if (manualConceptKey.value && currentConcept.value) {
     // Day 11、12、13、14、15、16、17、18、19、20 使用专门的解释提示函数
     if (props.currentDay === 11) return getDay11ExplanationHint(currentConcept.value.key)
@@ -405,12 +505,14 @@ const hintText = computed(() => {
     if (props.currentDay === 19) return getDay19ExplanationHint(currentConcept.value.key)
     if (props.currentDay === 20) return getDay20ExplanationHint(currentConcept.value.key)
     if (props.currentDay === 21) return getDay21ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 23) return getDay23ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 24) return getDay24ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 25) return getDay25ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 26) return getDay26ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 27) return getDay27ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 28) return getDay28ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 29) return getDay29ExplanationHint(currentConcept.value.key)
     return getConceptHint(currentConcept.value.key)
-  }
-  
-  // 优先级 6: 外部传入的自定义提示
-  if (props.customHint) {
-    return props.customHint
   }
   
   // 默认显示当前概念的详细解释
