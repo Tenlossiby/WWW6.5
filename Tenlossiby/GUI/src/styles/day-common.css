@@ -32,6 +32,9 @@
 .left-column {
   min-width: 0;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .content-layout.single-column .left-column {

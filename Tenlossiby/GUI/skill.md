@@ -1,6 +1,6 @@
 # Solidity学习互动演示GUI开发工作流程 Skill
 
-> 文档版本：20260326 (Day 29 已添加)
+> 文档版本：20260327 (Day 30 已添加)
 
 ## 项目概述
 
@@ -51,7 +51,8 @@ GUI/
 │   │       ├── Day26/NFTMarketplace.vue       # NFT市场 + 挂单/购买/取消/版税/市场费
 │   │   ├── Day27/YieldFarming.vue         # 收益耕作 + DeFi质押/奖励计算/紧急提取
     │   │   ├── Day28/DecentralizedGovernance.vue # 去中心化治理 + DAO治理/提案/投票/执行
-    │   │   └── Day29/SimpleStablecoin.vue     # 简单稳定币 + 超额抵押/价格预言机/清算机制
+    │   │   ├── Day29/SimpleStablecoin.vue     # 简单稳定币 + 超额抵押/价格预言机/清算机制
+    │   │   └── Day30/MiniDex.vue              # 迷你DEX + 自动化做市商/流动性池/代币交换/LP代币
 │   ├── composables/               # 组合式函数
 │   │   ├── useDay1.js
 │   │   ├── useDay2.js
@@ -73,7 +74,8 @@ GUI/
 │   │   ├── useDay26.js            # NFTMarketplace 业务逻辑 + NFT市场/挂单/购买/版税
 │   │   ├── useDay27.js            # YieldFarming 业务逻辑 + DeFi质押/奖励计算/紧急提取
     │   │   ├── useDay28.js            # DecentralizedGovernance 业务逻辑 + DAO治理/提案/投票/执行
-    │   │   └── useDay29.js            # SimpleStablecoin 业务逻辑 + 超额抵押/铸造/销毁/清算
+    │   │   ├── useDay29.js            # SimpleStablecoin 业务逻辑 + 超额抵押/铸造/销毁/清算
+    │   │   └── useDay30.js            # MiniDex 业务逻辑 + AMM/流动性池/代币交换/LP代币
 │   ├── data/
 │   │   ├── concepts.js            # 概念定义
 │   │   └── days.js                # 日程配置（核心配置）
@@ -266,6 +268,45 @@ const dayComponents = {
 4. **错误处理**
    - 添加 `ComingSoon` 组件处理未实现天数
    - 统一输入验证
+
+### Vue 3 Composable 响应式传递最佳实践（20260327 Day 30 重大经验教训）
+
+**问题现象**:
+父组件计算值正确，但子组件接收到的 props 始终为 0 或初始值。
+
+**错误代码**:
+```javascript
+// ❌ 错误：toRefs 包含函数，且直接传递 ref
+const { calculatedLPTokens, addLiquidity } = toRefs(day30)
+<LiquidityPanel :calculated-lp-tokens="calculatedLPTokens" />  // 可能失败
+```
+
+**正确方案**:
+```javascript
+// 1. 分离 ref/computed 和函数的解构
+const { calculatedLPTokens, addAmount0 } = toRefs(day30)  // ref/computed
+const { addLiquidity, swap } = day30  // 函数直接解构
+
+// 2. 创建新的 computed 传递给子组件
+const displayLPTokens = computed(() => calculatedLPTokens.value)
+
+// 3. 模板中传递新的 computed
+<LiquidityPanel :calculated-lp-tokens="displayLPTokens" />
+```
+
+**核心原则**:
+| 类型 | 处理方式 | 传递给子组件 |
+|------|---------|-------------|
+| ref/computed | `toRefs(day30)` 解构 | 包装成新的 `computed()` |
+| 函数 | 直接解构 `day30` | 直接调用 |
+
+**经验教训**:
+1. `toRefs()` 会把**所有属性**都转换成 ref，包括函数
+2. 直接传递 `toRefs()` 解构的 ref 到子组件可能解包失败
+3. 创建新的 `computed()` 包装是更安全可靠的传递方式
+4. 函数永远不要使用 `toRefs()` 包裹，否则调用时需要 `.value`
+
+---
 
 ### 实验性功能（未完成）
 

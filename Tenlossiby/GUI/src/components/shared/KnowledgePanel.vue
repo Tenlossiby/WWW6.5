@@ -55,7 +55,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useConceptInteraction } from '@/composables/useConceptInteraction'
-import { conceptDefinitions, getHint, getConceptExplanationHint, day11ConceptDefinitions, getDay11ExplanationHint, day12ConceptDefinitions, getDay12Hint, getDay12ExplanationHint, day13ConceptDefinitions, getDay13ExplanationHint, day14ConceptDefinitions, getDay14Hint, getDay14ExplanationHint, day15ConceptDefinitions, getDay15Hint, getDay15ExplanationHint, day16ConceptDefinitions, getDay16Hint, getDay16ExplanationHint, day17ConceptDefinitions, getDay17Hint, getDay17ExplanationHint, day18ConceptDefinitions, getDay18Hint, getDay18ExplanationHint, day19ConceptDefinitions, getDay19Hint, getDay19ExplanationHint, day20ConceptDefinitions, getDay20Hint, getDay20ExplanationHint, day21ConceptDefinitions, getDay21Hint, getDay21ExplanationHint, day22ConceptDefinitions, getDay22Hint, getDay22ExplanationHint, day23ConceptDefinitions, getDay23Hint, getDay23ExplanationHint, day24ConceptDefinitions, getDay24Hint, getDay24ExplanationHint, day25ConceptDefinitions, getDay25Hint, getDay25ExplanationHint, day26ConceptDefinitions, getDay26Hint, getDay26ExplanationHint, day27ConceptDefinitions, getDay27Hint, getDay27ExplanationHint, day28ConceptDefinitions, getDay28Hint, getDay28ExplanationHint, day29ConceptDefinitions, getDay29Hint, getDay29ExplanationHint } from '@/data/concepts'
+import { conceptDefinitions, getHint, getConceptExplanationHint, day11ConceptDefinitions, getDay11ExplanationHint, day12ConceptDefinitions, getDay12Hint, getDay12ExplanationHint, day13ConceptDefinitions, getDay13ExplanationHint, day14ConceptDefinitions, getDay14Hint, getDay14ExplanationHint, day15ConceptDefinitions, getDay15Hint, getDay15ExplanationHint, day16ConceptDefinitions, getDay16Hint, getDay16ExplanationHint, day17ConceptDefinitions, getDay17Hint, getDay17ExplanationHint, day18ConceptDefinitions, getDay18Hint, getDay18ExplanationHint, day19ConceptDefinitions, getDay19Hint, getDay19ExplanationHint, day20ConceptDefinitions, getDay20Hint, getDay20ExplanationHint, day21ConceptDefinitions, getDay21Hint, getDay21ExplanationHint, day22ConceptDefinitions, getDay22Hint, getDay22ExplanationHint, day23ConceptDefinitions, getDay23Hint, getDay23ExplanationHint, day24ConceptDefinitions, getDay24Hint, getDay24ExplanationHint, day25ConceptDefinitions, getDay25Hint, getDay25ExplanationHint, day26ConceptDefinitions, getDay26Hint, getDay26ExplanationHint, day27ConceptDefinitions, getDay27Hint, getDay27ExplanationHint, day28ConceptDefinitions, getDay28Hint, getDay28ExplanationHint, day29ConceptDefinitions, getDay29Hint, getDay29ExplanationHint, day30ConceptDefinitions, getDay30Hint, getDay30ExplanationHint } from '@/data/concepts'
 
 const props = defineProps({
   // 当前Day编号
@@ -281,6 +281,9 @@ const getConceptDefinition = (key) => {
   if (props.currentDay === 29) {
     return day29ConceptDefinitions[key]
   }
+  if (props.currentDay === 30) {
+    return day30ConceptDefinitions[key]
+  }
   return conceptDefinitions[key]
 }
 
@@ -491,6 +494,11 @@ const hintText = computed(() => {
     return getDay29Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
   }
 
+  // 优先级 7: Day 30 显示下一步提示
+  if (props.currentDay === 30 && currentConcept.value && !manualConceptKey.value) {
+    return getDay30Hint(props.unlockedConcepts[props.unlockedConcepts.length - 1])
+  }
+
   // 优先级 8: 用户手动点击概念标签，显示详细解释
   if (manualConceptKey.value && currentConcept.value) {
     // Day 11、12、13、14、15、16、17、18、19、20 使用专门的解释提示函数
@@ -512,6 +520,7 @@ const hintText = computed(() => {
     if (props.currentDay === 27) return getDay27ExplanationHint(currentConcept.value.key)
     if (props.currentDay === 28) return getDay28ExplanationHint(currentConcept.value.key)
     if (props.currentDay === 29) return getDay29ExplanationHint(currentConcept.value.key)
+    if (props.currentDay === 30) return getDay30ExplanationHint(currentConcept.value.key)
     return getConceptHint(currentConcept.value.key)
   }
   

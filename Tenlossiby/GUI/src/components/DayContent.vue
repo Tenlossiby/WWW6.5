@@ -43,7 +43,8 @@ const dayComponents = {
   26: defineAsyncComponent(() => import('./days/Day26/NFTMarketplace.vue')),
   27: defineAsyncComponent(() => import('./days/Day27/YieldFarming.vue')),
   28: defineAsyncComponent(() => import('./days/Day28/DecentralizedGovernance.vue')),
-  29: defineAsyncComponent(() => import('./days/Day29/SimpleStablecoin.vue'))
+  29: defineAsyncComponent(() => import('./days/Day29/SimpleStablecoin.vue')),
+  30: defineAsyncComponent(() => import('./days/Day30/MiniDex.vue'))
 }
 
 const props = defineProps({

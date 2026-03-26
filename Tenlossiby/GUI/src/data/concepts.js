@@ -114,7 +114,13 @@ export const gasEstimates = {
     mintStablecoin29: 60000,      // 铸造稳定币
     burnStablecoin29: 45000,      // 销毁稳定币
     withdrawCollateral29: 55000,  // 提取抵押品
-    liquidate29: 80000            // 清算
+    liquidate29: 80000,           // 清算
+    
+    // ========== Day 30 - MiniDex ==========
+    createPair30: 120000,         // 创建交易对（部署新合约）
+    addLiquidity30: 80000,       // 添加流动性（ERC20转账+铸造LP）
+    removeLiquidity30: 75000,    // 移除流动性（销毁LP+转账）
+    swap30: 65000                // 代币交换（两次ERC20转账）
 };
 
 export const ethPricePerGwei = 0.00000004;
@@ -4388,3 +4394,294 @@ export const getDay29ExplanationHint = (conceptKey) => {
     }
     return hints[conceptKey] || "📖 点击其他概念标签查看更多详细解释。"
 }
+
+// ========== Day 30 概念定义 ==========
+export const day30ConceptDefinitions = {
+    factory_pattern: {
+        name: "工厂模式",
+        icon: "🏭",
+        unlockAt: 1,
+        message: "你了解了工厂模式！Factory合约统一创建和管理交易对，是创建型设计模式的经典应用。",
+        code: `// MiniDexFactory.sol - 工厂合约
+contract MiniDexFactory {
+    mapping(address => mapping(address => address)) public getPair;
+    address[] public allPairs;
+    
+    function createPair(address tokenA, address tokenB) 
+        external returns (address pair) {
+        // 排序地址避免重复
+        (address token0, address token1) = tokenA < tokenB 
+            ? (tokenA, tokenB) : (tokenB, tokenA);
+        
+        // 部署新的交易对合约
+        MiniDexPair newPair = new MiniDexPair(token0, token1);
+        pair = address(newPair);
+        
+        // 更新映射
+        getPair[token0][token1] = pair;
+        getPair[token1][token0] = pair;
+        allPairs.push(pair);
+        
+        emit PairCreated(token0, token1, pair, allPairs.length);
+    }
+}`
+    },
+    constant_product: {
+        name: "恒定乘积公式",
+        icon: "📐",
+        unlockAt: 2,
+        message: "你了解了恒定乘积公式 x*y=k！这是AMM的核心算法，保持两种代币储备的乘积不变。",
+        code: `// 恒定乘积公式: x * y = k
+// reserve0 * reserve1 = k (常数)
+
+// 交换计算:
+// 用户输入 amountIn，想要 amountOut
+// 新储备量: reserve0' = reserve0 + amountIn
+//           reserve1' = reserve1 - amountOut
+// 必须满足: reserve0' * reserve1' >= reserve0 * reserve1
+
+function swap(uint256 amount0Out, uint256 amount1Out, address to) 
+    external nonReentrant {
+    // ... 发送输出代币
+    
+    uint256 balance0 = IERC20(token0).balanceOf(address(this));
+    uint256 balance1 = IERC20(token1).balanceOf(address(this));
+    
+    // 恒定乘积检查
+    require(balance0 * balance1 >= reserve0 * reserve1, "K");
+    
+    _update(balance0, balance1);
+}`
+    },
+    price_discovery: {
+        name: "价格发现机制",
+        icon: "💰",
+        unlockAt: 3,
+        message: "你了解了价格发现机制！价格由储备比例自动决定，无需订单簿，实现去中心化自动定价。",
+        code: `// 价格发现机制
+// 代币价格由储备比例自动决定
+
+// Token0 价格 = reserve1 / reserve0
+// Token1 价格 = reserve0 / reserve1
+
+// 示例:
+// reserve0 = 100,000 USDC
+// reserve1 = 50 WETH
+// 1 WETH 价格 = 100,000 / 50 = 2,000 USDC
+
+// 交换时自动调整价格
+// 大额交易会导致价格滑点
+// 滑点 = (实际价格 - 预期价格) / 预期价格`
+    },
+    liquidity_calculation: {
+        name: "流动性计算",
+        icon: "🧮",
+        unlockAt: 4,
+        message: "你了解了流动性计算！首次添加用几何平均，后续按比例分配，确保公平性。",
+        code: `// 流动性计算
+function addLiquidity(uint256 amount0, uint256 amount1) 
+    external returns (uint256 liquidity) {
+    uint256 totalSupply = totalSupply();
+    
+    if (totalSupply == 0) {
+        // 首次添加：几何平均数
+        // liquidity = √(amount0 * amount1)
+        liquidity = sqrt(amount0 * amount1);
+    } else {
+        // 后续添加：按比例分配
+        // 取最小值防止套利
+        liquidity = min(
+            (amount0 * totalSupply) / reserve0,
+            (amount1 * totalSupply) / reserve1
+        );
+    }
+    
+    require(liquidity > 0, "Insufficient liquidity minted");
+    _mint(msg.sender, liquidity);
+}`
+    },
+    sqrt_calculation: {
+        name: "平方根计算",
+        icon: "🔢",
+        unlockAt: 5,
+        message: "你了解了平方根计算！使用牛顿迭代法计算整数平方根，liquidity = √(amount0 × amount1)。",
+        code: `// 牛顿迭代法计算平方根
+function sqrt(uint256 y) internal pure returns (uint256 z) {
+    if (y > 3) {
+        z = y;
+        uint256 x = y / 2 + 1;
+        // 牛顿迭代: x_{n+1} = (y / x_n + x_n) / 2
+        while (x < z) {
+            z = x;
+            x = (y / x + x) / 2;
+        }
+    } else if (y != 0) {
+        z = 1;
+    }
+    // y == 0 时，z 保持为 0
+}
+
+// 使用示例:
+// amount0 = 1000, amount1 = 4000
+// liquidity = sqrt(1000 * 4000) = sqrt(4,000,000) = 2000`
+    },
+    address_sorting: {
+        name: "地址排序",
+        icon: "📋",
+        unlockAt: 6,
+        message: "你了解了地址排序！系统自动将地址较小的作为token0，避免重复创建交易对。",
+        code: `// 地址排序机制
+function createPair(address tokenA, address tokenB) 
+    external returns (address pair) {
+    // 对代币地址进行排序，确保 token0 < token1
+    // 这样可以避免 A-B 和 B-A 被认为是不同的交易对
+    (address token0, address token1) = tokenA < tokenB 
+        ? (tokenA, tokenB) 
+        : (tokenB, tokenA);
+    
+    // 检查交易对尚未创建
+    require(getPair[token0][token1] == address(0), "Pair exists");
+    
+    // 创建交易对...
+}
+
+// 示例:
+// USDC = 0xa0b8... (较小)
+// WETH = 0xc02a... (较大)
+// → token0 = USDC, token1 = WETH`
+    },
+    double_mapping: {
+        name: "双重映射",
+        icon: "🗺️",
+        unlockAt: 7,
+        message: "你了解了双重映射！getPair[A][B]=getPair[B][A]，无论以什么顺序查询都能找到同一交易对。",
+        code: `// 双重映射机制
+mapping(address => mapping(address => address)) public getPair;
+
+function createPair(address tokenA, address tokenB) 
+    external returns (address pair) {
+    // ... 创建交易对
+    
+    // 存储正向映射
+    getPair[token0][token1] = pair;
+    
+    // 存储反向映射
+    // 这样无论用户以什么顺序传入代币，都能找到交易对
+    getPair[token1][token0] = pair;
+}
+
+// 查询示例:
+// getPair[USDC][WETH] = 0x1234...5678
+// getPair[WETH][USDC] = 0x1234...5678  // 同一地址！`
+    },
+    add_liquidity: {
+        name: "添加流动性",
+        icon: "💧",
+        unlockAt: 8,
+        message: "你成功添加了流动性！存入两种代币获得LP代币，成为流动性提供者享受交易手续费分成。",
+        code: `function addLiquidity(uint256 amount0, uint256 amount1) 
+    external returns (uint256 liquidity) {
+    // 从用户转移代币到合约
+    IERC20(token0).transferFrom(msg.sender, address(this), amount0);
+    IERC20(token1).transferFrom(msg.sender, address(this), amount1);
+    
+    // 计算LP代币数量
+    uint256 totalSupply = totalSupply();
+    if (totalSupply == 0) {
+        liquidity = sqrt(amount0 * amount1);
+    } else {
+        liquidity = min(
+            (amount0 * totalSupply) / reserve0,
+            (amount1 * totalSupply) / reserve1
+        );
+    }
+    
+    // 铸造LP代币
+    _mint(msg.sender, liquidity);
+    _update(reserve0 + amount0, reserve1 + amount1);
+}`
+    },
+    remove_liquidity: {
+        name: "移除流动性",
+        icon: "🔥",
+        unlockAt: 9,
+        message: "你成功移除了流动性！销毁LP代币按比例取回两种代币，完成流动性提供周期。",
+        code: `function removeLiquidity(uint256 liquidity) 
+    external returns (uint256 amount0, uint256 amount1) {
+    uint256 balance0 = IERC20(token0).balanceOf(address(this));
+    uint256 balance1 = IERC20(token1).balanceOf(address(this));
+    uint256 totalSupply = totalSupply();
+    
+    // 计算可取出的代币数量
+    // 公式: (LP数量 / 总LP数量) * 合约余额
+    amount0 = (liquidity * balance0) / totalSupply;
+    amount1 = (liquidity * balance1) / totalSupply;
+    
+    require(amount0 > 0 && amount1 > 0, "Insufficient amount");
+    
+    // 销毁LP代币并返还代币
+    _burn(msg.sender, liquidity);
+    IERC20(token0).transfer(msg.sender, amount0);
+    IERC20(token1).transfer(msg.sender, amount1);
+}`
+    },
+    swap_function: {
+        name: "交换功能",
+        icon: "🔄",
+        unlockAt: 10,
+        message: "你成功执行了代币交换！恒定乘积公式保证了交易的公平性，自动价格发现无需订单簿。",
+        code: `function swap(uint256 amount0Out, uint256 amount1Out, address to) 
+    external nonReentrant {
+    require(amount0Out > 0 || amount1Out > 0, "Insufficient output");
+    require(amount0Out < reserve0 && amount1Out < reserve1, "Insufficient liquidity");
+    
+    // 发送输出代币
+    if (amount0Out > 0) IERC20(token0).transfer(to, amount0Out);
+    if (amount1Out > 0) IERC20(token1).transfer(to, amount1Out);
+    
+    // 获取新余额
+    uint256 balance0 = IERC20(token0).balanceOf(address(this));
+    uint256 balance1 = IERC20(token1).balanceOf(address(this));
+    
+    // 恒定乘积检查: x * y >= k
+    require(balance0 * balance1 >= reserve0 * reserve1, "K");
+    
+    _update(balance0, balance1);
+    emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
+}`
+    }
+};
+
+// ========== Day 30 提示 ==========
+export const getDay30Hint = (conceptKey) => {
+    const hints = {
+        factory_pattern: "🏭 你了解了工厂模式！Factory合约统一创建和管理交易对。👉 点击数学原理面板了解CPMM！",
+        constant_product: "📐 你了解了恒定乘积公式 x*y=k！这是AMM的核心算法。👉 再次点击了解价格发现！",
+        price_discovery: "💰 太棒了！价格由储备比例自动决定，无需订单簿。👉 再次点击了解流动性计算！",
+        liquidity_calculation: "🧮 优秀！首次添加用几何平均，后续按比例分配。👉 再次点击了解平方根计算！",
+        sqrt_calculation: "🔢 牛顿迭代法计算平方根！liquidity = √(amount0 × amount1)。👉 去工厂创建交易对！",
+        address_sorting: "📋 地址排序确保token0<token1，避免重复创建交易对！👉 选择交易对了解双重映射！",
+        double_mapping: "🗺️ 双重映射getPair[A][B]=getPair[B][A]，查询更方便！👉 添加流动性体验LP代币！",
+        add_liquidity: "💧 成功添加流动性！你获得了LP代币作为流动性证明。👉 尝试代币交换！",
+        remove_liquidity: "🔥 成功移除流动性！按比例取回了两种代币。👉 查看完整代码了解实现细节！",
+        swap_function: "🔄 交换成功！恒定乘积公式保证了交易的公平性。🎉 恭喜完成所有概念！"
+    };
+    return hints[conceptKey] || "🏭 欢迎来到Day 30！👉 点击「🏭 DEX系统架构」了解工厂模式！";
+};
+
+// ========== Day 30 解释提示 ==========
+export const getDay30ExplanationHint = (conceptKey) => {
+    const hints = {
+        factory_pattern: "📖 工厂模式是创建型设计模式的经典应用。MiniDexFactory统一创建和管理交易对，确保每个代币对只有一个交易对，避免流动性分散。地址排序机制保证无论传入A-B还是B-A，都指向同一交易对。",
+        constant_product: "📖 恒定乘积公式 x*y=k 是AMM的核心算法。它保持两种代币储备的乘积不变，确保交易前后系统总价值守恒。这个公式自动实现价格发现，无需传统订单簿，是DeFi革命性的创新。",
+        price_discovery: "📖 价格发现是AMM的核心功能。代币价格由储备比例自动决定：token0价格=reserve1/reserve0。大额交易会导致价格滑点，滑点大小与交易规模成正比，这 incentivizes 套利者维持价格平衡。",
+        liquidity_calculation: "📖 流动性计算确保LP代币公平分配。首次添加使用几何平均数√(amount0*amount1)，后续添加按比例min(amount0/reserve0, amount1/reserve1)*totalSupply。取最小值防止套利者利用比例差异获利。",
+        sqrt_calculation: "📖 平方根计算使用牛顿迭代法（巴比伦算法），通过反复逼近计算整数平方根。算法收敛速度快，每次迭代精度翻倍。Solidity不支持浮点数，整数平方根是计算LP代币数量的必要工具。",
+        address_sorting: "📖 地址排序是防止重复创建交易对的关键。以太坊地址是20字节十六进制数，可以比较大小。Factory自动将较小地址作为token0，这样无论用户传入USDC-WETH还是WETH-USDC，都创建同一交易对。",
+        double_mapping: "📖 双重映射mapping(address=>mapping(address=>address))实现双向查询。getPair[token0][token1]和getPair[token1][token0]指向同一地址，用户无需记忆代币顺序，提升用户体验。",
+        add_liquidity: "📖 添加流动性是成为LP的第一步。用户存入两种代币，按当前比例或任意比例（首次）获得LP代币。LP代币代表用户在池子中的份额，可以随时移除流动性取回代币。",
+        remove_liquidity: "📖 移除流动性允许LP随时退出。销毁LP代币按比例取回两种代币，比例基于当前储备。LP可能面临无常损失，即相比持有代币，提供流动性可能获得更少收益，这是AMM的风险之一。",
+        swap_function: "📖 交换功能是DEX的核心。用户指定输出数量，合约计算需要的输入数量，确保恒定乘积公式成立。简化版不收取手续费，真实Uniswap收取0.3%分配给LP，激励流动性提供。"
+    };
+    return hints[conceptKey] || "📖 点击其他概念标签查看更多详细解释。";
+};

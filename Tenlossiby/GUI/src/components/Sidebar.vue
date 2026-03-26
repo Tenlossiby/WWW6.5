@@ -82,7 +82,7 @@
 <script setup>
 import { computed } from 'vue'
 import { dayConfigs } from '../data/days'
-import { conceptDefinitions, day11ConceptDefinitions, day12ConceptDefinitions, day13ConceptDefinitions, day14ConceptDefinitions, day15ConceptDefinitions, day16ConceptDefinitions, day17ConceptDefinitions, day18ConceptDefinitions, day19ConceptDefinitions, day20ConceptDefinitions, day21ConceptDefinitions, day22ConceptDefinitions, day23ConceptDefinitions, day24ConceptDefinitions, day25ConceptDefinitions, day26ConceptDefinitions, day27ConceptDefinitions, day28ConceptDefinitions, day29ConceptDefinitions } from '../data/concepts'
+import { conceptDefinitions, day11ConceptDefinitions, day12ConceptDefinitions, day13ConceptDefinitions, day14ConceptDefinitions, day15ConceptDefinitions, day16ConceptDefinitions, day17ConceptDefinitions, day18ConceptDefinitions, day19ConceptDefinitions, day20ConceptDefinitions, day21ConceptDefinitions, day22ConceptDefinitions, day23ConceptDefinitions, day24ConceptDefinitions, day25ConceptDefinitions, day26ConceptDefinitions, day27ConceptDefinitions, day28ConceptDefinitions, day29ConceptDefinitions, day30ConceptDefinitions } from '../data/concepts'
 import { useOperationLogStore } from '@/stores/operationLogStore'
 
 const props = defineProps({
@@ -172,6 +172,8 @@ const currentDayConcepts = computed(() => {
     conceptDefs = day28ConceptDefinitions
   } else if (props.currentDay === 29) {
     conceptDefs = day29ConceptDefinitions
+  } else if (props.currentDay === 30) {
+    conceptDefs = day30ConceptDefinitions
   }
 
   return dayConfig.concepts.map(conceptKey => {
