@@ -15,7 +15,7 @@
 - **样式**: CSS3 (Flexbox布局)
 - **语言**: JavaScript
 
-### 目录结构（20260317更新）
+### 目录结构（20260327更新）
 ```
 GUI/
 ├── src/
@@ -49,33 +49,76 @@ GUI/
 │   │       ├── Day24/EnhancedSimpleEscrow.vue # 增强托管合约 + 三方托管/超时/争议
 │   │       ├── Day25/AutomatedMarketMaker.vue # 自动化做市商 + 流动性池/代币交换/LP代币
 │   │       ├── Day26/NFTMarketplace.vue       # NFT市场 + 挂单/购买/取消/版税/市场费
-│   │   ├── Day27/YieldFarming.vue         # 收益耕作 + DeFi质押/奖励计算/紧急提取
-    │   │   ├── Day28/DecentralizedGovernance.vue # 去中心化治理 + DAO治理/提案/投票/执行
-    │   │   ├── Day29/SimpleStablecoin.vue     # 简单稳定币 + 超额抵押/价格预言机/清算机制
-    │   │   └── Day30/MiniDex.vue              # 迷你DEX + 自动化做市商/流动性池/代币交换/LP代币
+│   │   ├── Day3/PollStation.vue           # 投票站 + 候选人/票数统计
+│   │   ├── Day4/AuctionHouse.vue          # 拍卖行 + 出价/结束拍卖
+│   │   ├── Day5/AdminOnly.vue             # 管理员权限 + 权限控制
+│   │   ├── Day6/EtherPiggyBank.vue        # 以太币存钱罐 + 存取/会员
+│   │   ├── Day7/SimpleIOUApp.vue          # 简单借条应用 + 借还/好友
+│   │   ├── Day8/TipJar.vue                # 小费罐 + 多币种/转换率
+│   │   ├── Day9/SmartCalculator.vue       # 智能计算器 + 权限/历史
+│   │   ├── Day10/ActivityTracker.vue      # 活动追踪器 + 里程碑
+│   │   ├── Day11/MasterkeyContract.vue    # 万能钥匙合约 + 继承/所有权
+│   │   ├── Day12/ERC20Token.vue           # ERC20代币 + 标准实现
+│   │   ├── Day13/MyToken.vue              # 我的代币 + virtual函数
+│   │   ├── Day14/SafeDeposit.vue          # 安全存款 + 抽象合约/接口/工厂
+│   │   ├── Day15/GasEfficientVoting.vue   # Gas优化投票 + 位运算
+│   │   ├── Day16/PluginStore.vue          # 插件商店 + 动态调用/ABI
+│   │   ├── Day17/UpgradeHub.vue           # 升级中心 + 代理模式
+│   │   ├── Day18/OracleContract.vue       # 预言机合约 + 双预言机
+│   │   ├── Day19/SignThis.vue             # 签名验证 + ECDSA/空投
+│   │   ├── Day20/ReentryAttack.vue        # 重入攻击 + 安全防护
+│   │   ├── Day21/SimpleNFT.vue            # 简单NFT + ERC721标准
+│   │   ├── Day22/FairChainLottery.vue     # 公平链上彩票 + VRF随机数
+│   │   ├── Day23/SimpleLending.vue        # 简单借贷 + DeFi/抵押/利息
+│   │   ├── Day24/EnhancedSimpleEscrow.vue # 增强托管 + 三方/超时/争议
+│   │   ├── Day25/AutomatedMarketMaker.vue # AMM + 流动性池/交换
+│   │   ├── Day26/NFTMarketplace.vue       # NFT市场 + 挂单/版税
+│   │   ├── Day27/YieldFarming.vue         # 收益耕作 + 质押/奖励
+│   │   ├── Day28/DecentralizedGovernance.vue # 去中心化治理 + DAO
+│   │   ├── Day29/SimpleStablecoin.vue     # 简单稳定币 + 超额抵押
+│   │   └── Day30/                         # 迷你DEX + AMM/LP代币
+│   │       ├── MiniDex.vue                # 主组件
+│   │       └── components/                # 子组件
+│   │           ├── ArchitectureDiagram.vue    # 架构图
+│   │           ├── MathPrinciplePanel.vue     # 数学原理面板
+│   │           ├── FactoryPanel.vue           # 工厂面板
+│   │           ├── PairSelector.vue           # 交易对选择器
+│   │           ├── PoolStatus.vue             # 池子状态
+│   │           ├── LiquidityPanel.vue         # 流动性面板
+│   │           └── SwapPanel.vue              # 交换面板
 │   ├── composables/               # 组合式函数
-│   │   ├── useDay1.js
-│   │   ├── useDay2.js
-│   │   ├── useDay11.js
-│   │   ├── useDay12.js
-│   │   ├── useDay13.js
-│   │   ├── useDay14.js            # SafeDeposit 业务逻辑
-│   │   ├── useDay15.js            # GasEfficientVoting 业务逻辑
-│   │   ├── useDay16.js            # PluginStore 业务逻辑 + ABI 编码
-│   │   ├── useDay17.js            # UpgradeHub 业务逻辑 + 升级机制
-│   │   ├── useDay18.js            # OracleContract 业务逻辑 + 双预言机
-│   │   ├── useDay19.js            # SignThis 业务逻辑 + ECDSA签名
-│   │   ├── useDay20.js            # ReentryAttack 业务逻辑 + 重入攻击模拟
-│   │   ├── useDay21.js            # SimpleNFT 业务逻辑 + NFT铸造/转移/授权
-│   │   ├── useDay22.js            # FairChainLottery 业务逻辑 + 彩票/VRF/获胜者
-│   │   ├── useDay23.js            # SimpleLending 业务逻辑 + DeFi借贷/抵押/利息
-│   │   ├── useDay24.js            # EnhancedSimpleEscrow 业务逻辑 + 三方托管/超时/争议
-│   │   ├── useDay25.js            # AutomatedMarketMaker 业务逻辑 + AMM/流动性/交换
-│   │   ├── useDay26.js            # NFTMarketplace 业务逻辑 + NFT市场/挂单/购买/版税
-│   │   ├── useDay27.js            # YieldFarming 业务逻辑 + DeFi质押/奖励计算/紧急提取
-    │   │   ├── useDay28.js            # DecentralizedGovernance 业务逻辑 + DAO治理/提案/投票/执行
-    │   │   ├── useDay29.js            # SimpleStablecoin 业务逻辑 + 超额抵押/铸造/销毁/清算
-    │   │   └── useDay30.js            # MiniDex 业务逻辑 + AMM/流动性池/代币交换/LP代币
+│   │   ├── useDay1.js             # ClickCounter 逻辑
+│   │   ├── useDay2.js             # SaveMyName 逻辑
+│   │   ├── useDay3.js             # PollStation 逻辑
+│   │   ├── useDay4.js             # AuctionHouse 逻辑
+│   │   ├── useDay5.js             # AdminOnly 逻辑
+│   │   ├── useDay6.js             # EtherPiggyBank 逻辑
+│   │   ├── useDay7.js             # SimpleIOUApp 逻辑
+│   │   ├── useDay8.js             # TipJar 逻辑
+│   │   ├── useDay9.js             # SmartCalculator 逻辑
+│   │   ├── useDay10.js            # ActivityTracker 逻辑
+│   │   ├── useDay11.js            # MasterkeyContract 逻辑
+│   │   ├── useDay12.js            # ERC20Token 逻辑
+│   │   ├── useDay13.js            # MyToken 逻辑
+│   │   ├── useDay14.js            # SafeDeposit 逻辑
+│   │   ├── useDay15.js            # GasEfficientVoting 逻辑
+│   │   ├── useDay16.js            # PluginStore 逻辑
+│   │   ├── useDay17.js            # UpgradeHub 逻辑
+│   │   ├── useDay18.js            # OracleContract 逻辑
+│   │   ├── useDay19.js            # SignThis 逻辑
+│   │   ├── useDay20.js            # ReentryAttack 逻辑
+│   │   ├── useDay21.js            # SimpleNFT 逻辑
+│   │   ├── useDay22.js            # FairChainLottery 逻辑
+│   │   ├── useDay23.js            # SimpleLending 逻辑
+│   │   ├── useDay24.js            # EnhancedSimpleEscrow 逻辑
+│   │   ├── useDay25.js            # AutomatedMarketMaker 逻辑
+│   │   ├── useDay26.js            # NFTMarketplace 逻辑
+│   │   ├── useDay27.js            # YieldFarming 逻辑
+│   │   ├── useDay28.js            # DecentralizedGovernance 逻辑
+│   │   ├── useDay29.js            # SimpleStablecoin 逻辑
+│   │   ├── useDay30.js            # MiniDex 逻辑
+│   │   ├── useConceptInteraction.js   # 概念交互通用逻辑
+│   │   └── useCurrentDayRealtimeData.js # 当前天数实时数据
 │   ├── data/
 │   │   ├── concepts.js            # 概念定义
 │   │   └── days.js                # 日程配置（核心配置）
@@ -89,48 +132,84 @@ GUI/
 └── skill.md                       # 本文件
 ```
 
-### 状态管理架构（20260317更新）
+### 状态管理架构（20260327更新）
 
-使用 Pinia 进行状态管理，替代了原来的集中式 App.vue 状态。
+使用 Pinia + Vue Composables 进行状态管理，替代了原来的集中式 App.vue 状态。
+
+#### 架构演进
+
+**Day 1-11**: 使用 `contractStore.js` 集中管理合约状态
+**Day 12-30**: 使用 `useDayX.js` composables 分散管理，每个 Day 独立维护自己的状态
+
+#### Pinia Stores
 
 ```javascript
-// contractStore.js - 合约状态
+// contractStore.js - 合约状态（Day 1-11）
 contracts: {
-  day1: { count, interactionCount },
-  day2: { name, bio, hasStored, hasRetrieved },
-  day3: { candidates, voteCount },
-  day4: { bids, highestBidder, ended },
-  day5: { owner, treasureAmount, allowance },
-  day6: { members, balances, bankManager },
-  day7: { debts, balances, friendList },
-  day8: { owner, totalTips, conversionRates, isUserAdmin },
-  day9: { owner, userAddress, isUserAdmin, scientificCalculatorAddress, isAddressSet, operationCount, operationHistory, challengeTasks },
-  day10: { userProfile, workoutHistory, milestones, totalWorkouts, totalDistance },
-  day11: { owner, userAddress, contractBalance, eventLog, interactionCount },  // 继承 + 所有权管理
-  day12: { tokenName, tokenSymbol, totalSupply, balances, allowances, userAddress },  // ERC20 代币标准
-  day13: { tokenName, tokenSymbol, totalSupply, balances, allowances, userAddress },  // ERC20 + virtual 函数
-  day14: { depositBoxes, eventLog, boxCounter, currentRole, currentAddress },  // 抽象合约 + 接口 + 工厂模式
-  day15: { proposals, proposalCounter, votesCast, storageBits, userAddress, eventLog },  // Gas 优化技术
-  day16: { profiles, plugins, pluginData, currentUser, pluginCounter },  // 插件存储系统 + 动态调用
-  day17: { plans, subscriptions, currentVersion, isUpgraded, paused },  // 可升级合约 + 代理模式
-  day18: { currentUser, currentRole, ethPrice, rainfall, hasInsurance, contractBalance },  // 预言机 + 参数保险
-  day19: { currentRole, currentUserAddress, organizer, generatedSignature, isEntered, participantsList },  // 签名验证 + 无Gas空投
-  day20: { currentRole, vaultBalance, userBalances, reentrancyStatus, isAttacking, attackCount },  // 重入攻击 + 安全防护
-  day21: { nfts, tokenApprovals, operatorApprovals, selectedTokenId, mintForm, transferForm, approveForm, operatorForm, queryForm },  // ERC721 NFT标准 + 铸造/转移/授权
-  day22: { lotteryState, players, recentWinner, currentRole, entranceFee, prizePool, requestId },  // 公平链上彩票 + 状态机/VRF/获胜者
-  day23: { walletBalance, depositBalance, collateralBalance, borrowBalance, currentDebt, healthFactor, totalLiquidity, utilizationRate, interestRate, lastUpdateTime },  // DeFi借贷 + 存款/抵押/借款/利息
-  day24: { escrowState, currentRole, funds, escrowInfo, eventLog, addresses },  // 三方托管 + 枚举状态机/超时/争议仲裁
-  day25: { reserveA, reserveB, totalLPSupply, lpBalances, swapHistory, priceImpact },  // AMM + 流动性池/代币交换/LP代币
-  day26: { listings, marketplaceFeePercent, feeRecipient, totalVolume, userNFTs, activeListings, myListings }  // NFT市场 + 挂单/购买/取消/版税
+  day1: { count, interactionCount },  // 点击计数器
+  day2: { name, bio, hasStored, hasRetrieved, interactionCount },  // 名字存储
+  day3: { candidates, voteCount, interactionCount },  // 投票站
+  day4: { owner, item, auctionEndTime, highestBidder, highestBid, ended, bids, bidders, interactionCount },  // 拍卖行
+  day5: { owner, treasureAmount, withdrawalAllowance, hasWithdrawn, userAddress, userAllowance, interactionCount },  // 管理员权限
+  day6: { bankManager, members, registeredMembers, balance, userAddress, interactionCount, depositCount, withdrawCount },  // 存钱罐
+  day7: { owner, userAddress, registeredFriends, friendList, balances, debts, interactionCount },  // 借条应用
+  day8: { owner, userAddress, isUserAdmin, totalTipsReceived, tipPerPerson, tipsPerCurrency, supportedCurrencies, conversionRates, interactionCount },  // 小费罐
+  day9: { owner, userAddress, isUserAdmin, scientificCalculatorAddress, isAddressSet, operationCount, operationHistory, challengeTasks, interactionCount },  // 计算器
+  day10: { owner, userAddress, userProfile, workoutHistory, totalWorkouts, totalDistance, milestones, interactionCount },  // 活动追踪
+  day11: { owner, userAddress, contractBalance, eventLog, interactionCount }  // 万能钥匙
 }
 
 // progressStore.js - 学习进度（自动从 dayConfigs 生成）
 dayProgress: {
-  1: { unlockedConcepts: [], totalConcepts: 4, interactionCount: 0 },
-  2: { unlockedConcepts: [], totalConcepts: 6, interactionCount: 0 },
-  // ... 自动计算 totalConcepts
+  1: { unlockedConcepts: [], totalConcepts: 4, interactionCount: 0, gasUsage: 0, ethCost: 0 },
+  2: { unlockedConcepts: [], totalConcepts: 6, interactionCount: 0, gasUsage: 0, ethCost: 0 },
+  // ... Day 3-30 自动从 dayConfigs 计算 totalConcepts
+  30: { unlockedConcepts: [], totalConcepts: 10, interactionCount: 0, gasUsage: 0, ethCost: 0 }
 }
+
+// operationLogStore.js - 操作日志（Day 12+ 使用）
+logs: [
+  { day, type, message, timestamp, gasUsed, ethCost }
+]
+// 主要方法：
+// - addLog(day, type, message, gasUsed, ethCost) - 添加日志
+// - getDayLogs(day) - 获取指定天数日志
+// - getDayGasUsage(day) - 获取Gas使用量
+// - getDayEthCost(day) - 获取ETH成本
+// - getDayOperationCount(day) - 获取操作次数
 ```
+
+#### Composables 状态（Day 12-30）
+
+从 Day 12 开始，每个 Day 使用独立的 composable 管理状态：
+
+```javascript
+// useDay12.js - ERC20Token 状态示例
+const tokenInfo = ref({ name, symbol, decimals, totalSupply })
+const balances = ref({ [address]: amount })
+const allowances = ref({ [owner]: { [spender]: amount } })
+const currentRole = ref('alice')
+const eventLog = ref([...])
+
+// useDay30.js - MiniDex 状态示例
+const allPairs = ref([])
+const selectedPair = ref(null)
+const reserves = ref({ token0, token1 })
+const totalSupply = ref(0)
+const userLPBalance = ref(0)
+const addAmount0 = ref('')
+const addAmount1 = ref('')
+// ... 计算属性
+const currentPrice = computed(() => ...)
+const calculatedLPTokens = computed(() => ...)
+```
+
+#### 状态管理最佳实践
+
+1. **Day 1-11**: 使用 `contractStore.getContract(dayNumber)` 获取和更新状态
+2. **Day 12+**: 使用 `useDayX()` composable 返回的 ref 和 computed
+3. **日志记录**: Day 12+ 使用 `useOperationLogStore()` 记录操作
+4. **进度追踪**: 统一使用 `progressStore.unlockConcept(day, concept)`
 
 ### 组件架构（20260312重构）
 
