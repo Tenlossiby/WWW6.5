@@ -2,9 +2,8 @@
 pragma solidity ^0.8.20;
 
 // 导入 OpenZeppelin 的 ERC20 合约
-// 使用 GitHub 链接导入，方便在 Remix 中直接使用
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.0.0/contracts/token/ERC20/ERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.0.0/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title Automated Market Maker with Liquidity Token
 /// @title 自动化做市商（AMM）合约
