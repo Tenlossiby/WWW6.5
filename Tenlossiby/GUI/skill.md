@@ -422,10 +422,4 @@ const displayLPTokens = computed(() => calculatedLPTokens.value)
 - [ ] 无控制台错误
 - [ ] 构建成功 (`npm run build`)
 
----
-
-## 参考文档
-
-- [AI_PROMPT_GUIDE.md](./AI_PROMPT_GUIDE.md) - 详细的AI开发指南
-- [Vue 3 文档](https://vuejs.org/)
-- [Pinia 文档](https://pinia.vuejs.org/)
+--- 
